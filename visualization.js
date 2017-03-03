@@ -1,9 +1,7 @@
 d3.tsv('food-data.txt', function(err, tsv) {
 
 
-    bla = tsv;
-
-    data = tsv.map( function(entry) { return {
+    let data = tsv.map( function(entry) { return {
         x: entry["carbohydrates, available"],
         y: entry["energy kJ"],
         label: entry["category D"].split("/")[0]
@@ -21,27 +19,11 @@ d3.tsv('food-data.txt', function(err, tsv) {
         dot: 2,
     }
 
-    let scale = {
-        y: 0.2,
-        x: 6,
-        auto: function(data, dimension) {
-            let size = 0;
-            if (dimension === "x") { size = dimensions.innerWidth() }
-            else if (dimension === "y") { size = dimensions.innerHeight() };
-
-            if (this.cachedScales[dimension] === undefined) {
-                this.cachedScales[dimension] = size / Math.max.apply(null, data.map(num => num[dimension]));
-            } 
-            return this.cachedScales[dimension];
-        },
-        cachedScales: {}
-    }
-
 
     /**
      * Setting up the canvas
      */
-    svg = d3.select("body").append("svg")
+    let svg = d3.select("body").append("svg")
         .attr("width", dimensions.width)
         .attr("height", dimensions.height)
         .append("g")
@@ -49,11 +31,11 @@ d3.tsv('food-data.txt', function(err, tsv) {
     // String interpolation with `${}`: http://es6-features.org/#StringInterpolation
     
 
-     scaleX = d3.scaleLinear()
+     let scaleX = d3.scaleLinear()
         .domain([0, d3.max(data, d => Number(d.x))])
         .range([0, dimensions.margin.left+dimensions.innerWidth()]);
 
-      scaleY = d3.scaleLinear()
+      let scaleY = d3.scaleLinear()
         .domain([0, d3.max(data, d => Number(d.y))])
         .range([0, dimensions.margin.top+dimensions.innerHeight()]);
 
