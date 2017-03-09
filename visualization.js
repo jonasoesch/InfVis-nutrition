@@ -23,11 +23,13 @@ d3.tsv('food-data.txt', function(err, tsv) {
     /**
      * Setting up the canvas
      */
-    let svg = d3.select("body").append("svg")
+    let canvas = d3.select("body").append("svg")
         .attr("width", dimensions.width)
         .attr("height", dimensions.height)
         .append("g")
-        .attr("transform", `translate(${dimensions.margin.top}, ${dimensions.margin.left})`);   
+        .attr("class", "canvas")
+        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`); // moves the canvas to the inside
+
     // String interpolation with `${}`: http://es6-features.org/#StringInterpolation
     
 
@@ -40,14 +42,14 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .range([0, dimensions.margin.top+dimensions.innerHeight()]);
 
 
-    svg.selectAll(".dot")
+    canvas.selectAll(".dot")
         .data(data)
         .enter().append("circle")
         .attr("class", "dot")
         .attr("r", dimensions.dot)
-        .attr("cx", d => scaleX(d.x) + dimensions.margin.left) 
+        .attr("cx", d => scaleX(d.x)) 
     // Arrow function: http://es6-features.org/#ExpressionBodies
-        .attr("cy", d => scaleY(d.y) + dimensions.margin.top);
+        .attr("cy", d => scaleY(d.y));
 
 
 
@@ -55,13 +57,13 @@ d3.tsv('food-data.txt', function(err, tsv) {
      * Setting the axis
      */
 
-    d3.select("svg")
+    canvas
         .append("g")
-        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
+        .attr("class", "margin-left")
         .call(d3.axisLeft(scaleY));
 
-    d3.select("svg")
+    canvas
         .append("g")
-        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
+        .attr("class", "margin-top")
         .call(d3.axisBottom(scaleX));
 })
