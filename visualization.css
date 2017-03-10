@@ -1,3 +1,9 @@
 circle {
     fill: rgba(200, 0, 0, 0.2)
 }
+
+text {
+    font-family: Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold:
+}
