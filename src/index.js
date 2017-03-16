@@ -82,19 +82,48 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .attr("y", dimensions.innerHeight() + dimensions.margin.top + dimensions.margin.bottom-15)
         .text("carbohydrates (g/100g)");
 
-    let legend = canvas
+    let fatLegend = canvas
         .append("g")
-        .attr("transform", `translate(${dimensions.innerWidth() - 200}, 50)`);
+        .attr("transform", `translate(${dimensions.innerWidth() - 400}, 50)`);
 
     for (let i of [10, 25, 50, 100]) {
-        legend
+        fatLegend
             .append("circle")
             .attr("r", scaleSize(i))
     }
 
 
+    let groupLegend = canvas
+        .append("g");
 
-    legend
+    let i = 0;
+    Object.keys(colorscale).forEach( function(group) {
+        let legend = groupLegend
+            .append("g")
+            .attr("transform", `translate(${dimensions.innerWidth() - 250}, ${i*12})`);
+
+
+        legend
+            .append("rect")
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", colorscale[group]);
+
+
+        legend
+            .append("text")
+            .attr("x", 20)
+            .attr("y", 10)
+            .attr("height", 10)
+            .text(group);
+
+        i++;
+    });
+
+
+
+
+    fatLegend
         .append("text")
         .attr("x", 16)
         .attr("y", 4)
