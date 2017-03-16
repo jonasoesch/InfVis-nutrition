@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 d3.tsv('food-data.txt', function(err, tsv) {
 
 
@@ -8,17 +10,36 @@ d3.tsv('food-data.txt', function(err, tsv) {
         label: entry["category D"].split("/")[0]
     }});
 
+
+
+    let unique = function(value, index, self) {
+        return self.indexOf(value) === index;
+    };
+
+
+   let colorscale = (function() {
+        let keys = data.map(e => e.label).filter(unique);
+        let palette = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928', '#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'];
+
+       let colorscale = {};
+       keys.forEach( (key, i) => colorscale[key] = palette[i]);
+
+       return colorscale;
+    })();
+
+    console.log(colorscale);
+
     /**
      * Configuring the canvas
      */
     let dimensions = { // `let`: http://es6-features.org/#BlockScopedVariables
         margin : {top: 10, right: 10, bottom: 60, left: 60},
-        width: 720,
+        width: 920,
         innerWidth : function() { return this.width - this.margin.left - this.margin.right },
         height : 600, 
         innerHeight : function() {return this.height - this.margin.top - this.margin.bottom },
         dot: 2,
-    }
+    };
 
 
 
@@ -49,7 +70,7 @@ d3.tsv('food-data.txt', function(err, tsv) {
 
      let scaleSize = d3.scaleLinear()
         .domain([0, d3.max(data, d => Number(d.size))])
-        .range([0, 50])
+        .range([0, 50]);
 
 
 
@@ -76,19 +97,19 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .attr('transform', "rotate(270,0,0)")
         .attr('x', dimensions.height/-2)
         .attr('y', -40)
-        .text("energy kJ")
+        .text("energy kJ");
 
     canvas
         .append("text")
         .attr("x", dimensions.innerWidth()/2)
         .attr("y", dimensions.innerHeight() + dimensions.margin.top + dimensions.margin.bottom-15)
-        .text("carbohydrates (g/100g)")
+        .text("carbohydrates (g/100g)");
 
     let legend = canvas
         .append("g")
-        .attr("transform", `translate(${dimensions.innerWidth() - 200}, 50)`)
+        .attr("transform", `translate(${dimensions.innerWidth() - 200}, 50)`);
 
-    for (var i of [10, 25, 50, 100]) {
+    for (let i of [10, 25, 50, 100]) {
         legend
             .append("circle")
             .attr("r", scaleSize(i))
@@ -100,7 +121,7 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .append("text")
         .attr("x", 16)
         .attr("y", 4)
-        .text("Total amount of fat")
+        .text("Total amount of fat");
 
 
     /*
@@ -110,8 +131,9 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .data(data)
         .enter().append("circle")
         .attr("class", "dot")
+        .attr("fill", d => colorscale[d.label])
         .attr("r", d => scaleSize(d.size))
         .attr("cx", d => scaleX(d.x))
     // Arrow function: http://es6-features.org/#ExpressionBodies
         .attr("cy", d => scaleY(d.y));
-})
+});
