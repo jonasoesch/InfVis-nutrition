@@ -1,145 +1,179 @@
 import * as d3 from 'd3';
-import * as Canvas from './canvas.js';
 
+const DEBUG = true;
+
+function dd(obj){
+    if(DEBUG === true) {
+        console.log(obj);
+    }
+}
 
 d3.tsv('food-data.txt', function(err, tsv) {
 
 
-    let data = tsv.map( function(entry) { return {
-        x: entry["carbohydrates, available"],
-        y: entry["energy kJ"],
-        size: entry["fat, total"],
-        label: entry["category D"].split("/")[0]
+    let foods_full = tsv.map( function(entry) { return {
+        "carbohydrates": entry["carbohydrates, available"],
+        "category": entry["category D"],
+        "kJ": entry["energy kJ"],
+        "fat": entry["fat, total"],
+        "fat, polyunsaturated": entry["fatty acids, polyunsaturated"],
+        "fat, monounsaturated": entry['fatty acids, monounsaturated'],
+        "fat, saturated": entry['fatty acids, saturated']
     }});
 
 
 
-    let unique = function(value, index, self) {
-        return self.indexOf(value) === index;
-    };
-
-
-   let colorscale = (function() {
-        let keys = data.map(e => e.label).filter(unique);
-        let palette = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928', '#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'];
-
-       let colorscale = {};
-       keys.forEach( (key, i) => colorscale[key] = palette[i]);
-
-       return colorscale;
-    })();
-
-    Canvas.setup();
-    let dimensions = Canvas.dimensions;
-    let canvas = Canvas.canvas;
-
-
-    /**
-     * Scales
-     */
-     let scaleX = d3.scaleLinear()
-        .domain([0, d3.max(data, d => Number(d.x))])
-        .range([0, dimensions.margin.left+dimensions.innerWidth()]);
-
-      let scaleY = d3.scaleLinear()
-        .domain([0, d3.max(data, d => Number(d.y))])
-        .range([dimensions.margin.top+dimensions.innerHeight(),0]);
-
-     let scaleSize = d3.scaleLinear()
-        .domain([0, d3.max(data, d => Number(d.size))])
-        .range([0, 50]);
-
-
-
-    /*
-     * Axes
-    */
-    canvas
-        .append("g")
-        .attr("class", "margin-left")
-        .call(d3.axisLeft(scaleY));
-
-    canvas
-        .append("g")
-        .attr("class", "margin-bottom")
-        .attr("transform", `translate(0, ${dimensions.innerHeight()+dimensions.margin.top})`)
-        .call(d3.axisBottom(scaleX));
-
-
-    /*
-     * Axes labels
-    */
-    canvas
-        .append("text")
-        .attr('transform', "rotate(270,0,0)")
-        .attr('x', dimensions.height/-2)
-        .attr('y', -40)
-        .text("energy kJ");
-
-    canvas
-        .append("text")
-        .attr("x", dimensions.innerWidth()/2)
-        .attr("y", dimensions.innerHeight() + dimensions.margin.top + dimensions.margin.bottom-15)
-        .text("carbohydrates (g/100g)");
-
-    let fatLegend = canvas
-        .append("g")
-        .attr("transform", `translate(${dimensions.innerWidth() - 400}, 50)`);
-
-    for (let i of [10, 25, 50, 100]) {
-        fatLegend
-            .append("circle")
-            .attr("r", scaleSize(i))
+    let foods = [];
+    for(let i = 0; i < 10; i++) {
+        foods.push(foods_full[i]);
     }
 
-
-    let groupLegend = canvas
-        .append("g");
-
-    let i = 0;
-    Object.keys(colorscale).forEach( function(group) {
-        let legend = groupLegend
-            .append("g")
-            .attr("transform", `translate(${dimensions.innerWidth() - 250}, ${i*12})`);
-
-
-        legend
-            .append("rect")
-            .attr("width", 10)
-            .attr("height", 10)
-            .attr("fill", colorscale[group]);
-
-
-        legend
-            .append("text")
-            .attr("x", 20)
-            .attr("y", 10)
-            .attr("height", 10)
-            .text(group);
-
-        i++;
+    let axesNames = d3.keys(foods[0]).filter(function(key) {
+        if (key === "category") return ;
+        else return key;
     });
 
 
+    let margin = {top: 30, right: 30, bottom: 10, left: 30},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
 
-    fatLegend
-        .append("text")
-        .attr("x", 16)
-        .attr("y", 4)
-        .text("Total amount of fat");
+    // Setting up the canvas
+    let svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
+    // Defining where the axes should be placed on x
+    let xAxisPositions = function(axis) {
+        let len = axis.length -1;
+        return axis.map((key, i) => i * width/len);
+    };
+
+    let xScale = d3.scaleOrdinal()
+        .range(xAxisPositions(axesNames))
+        .domain(axesNames);
+
+    let yScale = {};
+    axesNames.forEach(function(axis){
+        let max = 0;
+        if (axis === 'kJ') max = d3.max(foods, food => Number(food["kJ"]));
+        else max = 100;
+
+        yScale[axis] = d3.scaleLinear()
+            .domain([0, max])
+            .range([height, 0]);
+    });
+
+
+    let line = d3.line()
+        .x(d => xScale(d.x))
+        .y((d, i) => yScale[axesNames[i]](d.y));
+
+
+    let foodLine = function(food, i) {
+       let wrangledData= axesNames.map(function(key, i) {
+            return {x: key, y: food[key]};
+        });
+       return line(wrangledData, i);
+
+    };
+
+
+    // Add grey background lines for context when brushing
+    let background = svg.append("g")
+        .attr("class", "background")
+        .selectAll('path')
+        .data(foods)
+        .enter()
+        .append("path")
+        .attr("fill", "red")
+        .attr('d', foodLine);
+    // foodLine -> line -> selectYScale -> energyScale | nutrientScale -> yValue
+
+    let foreground = svg.append("g")
+        .attr('class', "foreground")
+        .selectAll('path')
+        .data(foods)
+        .enter()
+        .append("path")
+        .attr("fill", "red")
+        .attr('d', foodLine);
+        // foodLine -> line -> selectYScale -> energyScale | nutrientScale -> yValue
+
+    let dimensions = svg.selectAll('.dimension')
+        .data(axesNames)
+        .enter()
+        .append('g')
+        .attr('class', 'dimension')
+        .attr('transform', d => `translate(${xScale(d)})`);
 
     /*
-     * Data
+    Careful, `this` is not bound correctly when using the arrow-function
+    d => console.log(this) doesn't do what it should
      */
-    canvas.selectAll(".dot")
-        .data(data)
-        .enter().append("circle")
-        .attr("class", "dot")
-        .attr("fill", d => colorscale[d.label])
-        .attr("r", d => scaleSize(d.size))
-        .attr("cx", d => scaleX(d.x))
-    // Arrow function: http://es6-features.org/#ExpressionBodies
-        .attr("cy", d => scaleY(d.y));
+    dimensions
+        .append('g')
+        .attr('class', 'axis')
+        .each(function(d, i){
+            yScale[d].el = d3.select(this).call(d3.axisLeft(yScale[axesNames[i]]));
+        })
+        .append('text')
+        .style('text-anchor', 'middle')
+        .style('fill', '#fff')
+        .attr('y', -15)
+        .text( d => d);
+
+
+     dimensions
+         .attr('class', 'brush')
+         .each(function(d, i) {
+             yScale[d].brush = d3.brushY().on('brush', brush);
+             d3.select(this).call(yScale[d].brush);
+         });
+
+
+    function brush(axis) {
+
+        let activeBrushes = [];
+        axesNames.forEach(function(axisName) {
+            let axisEl = yScale[axisName].el.node();
+            let brush = d3.brushSelection(axisEl.parentNode);
+            if(brush !== null) {
+                activeBrushes.push({
+                    name: axis,
+                    min: brush[0],
+                    max: brush[1]
+                });
+            }
+        });
+
+
+        let visibility = function(d) {
+            let sel = d3.select(this).data()[0];
+            let isVisible = true;
+            activeBrushes.forEach(function(brush){
+                let value = (yScale[brush.name](sel[brush.name]));
+                if( value > brush.max) {
+                    isVisible = false;
+                } else if (value < brush.min) {
+                    isVisible = false;
+                }
+            });
+
+            if(!isVisible) {
+                return 'none'
+            } else {
+                return null;
+            }
+        };
+
+        foreground
+            .style('display', visibility);
+    }
+
+
 });
