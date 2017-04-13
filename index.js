@@ -1,5 +1,3 @@
-import * as d3 from 'd3';
-
 const DEBUG = true;
 
 function dd(obj){
@@ -90,7 +88,6 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .data(foods)
         .enter()
         .append("path")
-        .attr("fill", "red")
         .attr('d', foodLine);
     // foodLine -> line -> selectYScale -> energyScale | nutrientScale -> yValue
 
@@ -100,7 +97,7 @@ d3.tsv('food-data.txt', function(err, tsv) {
         .data(foods)
         .enter()
         .append("path")
-        .attr("fill", "red")
+        .attr('stroke', 'red')
         .attr('d', foodLine);
         // foodLine -> line -> selectYScale -> energyScale | nutrientScale -> yValue
 
