@@ -87,9 +87,17 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
     axes.forEach(function (axis, idx) {
         coordSystem.append('g')
             .attr('class', 'axis')
-            .attr('transform', 'rotate(' +  axesAngles[idx] * 180/Math.PI + ')')
+            .attr('transform', 'rotate(' +  svgHasADifferentZeroAngle( axesAngles[idx] * 180/Math.PI ) + ')')
             .call(axis);
     });
+
+    function svgHasADifferentZeroAngle(angle) {
+        if(angle >= 180) {
+            return angle - 180;
+        } else {
+            return angle + 180;
+        }
+    }
 
     // coordSystem.selectAll('.axis')
     //     .data(axesNames)
