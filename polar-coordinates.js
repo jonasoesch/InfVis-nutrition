@@ -84,12 +84,40 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
         return d3.axisLeft(radiusScales[idx]);
     });
 
+    var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
+
     axes.forEach(function (axis, idx) {
         coordSystem.append('g')
             .attr('class', 'axis')
-            .attr('transform', 'rotate(' +  svgHasADifferentZeroAngle( axesAngles[idx] * 180/Math.PI ) + ')')
-            .call(axis);
+            .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
+            .call(axis)
+            .append('text')
+                .attr('fill', 'black')
+                .attr('y', R+10)
+                .attr('transform', 'rotate(' + -adaptedAxesAngles[idx] + ',0,' + (R+10) + ')')
+                .attr('text-anchor', getTextAnchor(adaptedAxesAngles[idx]))
+                .text(axesNames[idx]);
     });
+
+
+    function getTextAnchor(axisAngle) {
+        let eps = 1;
+        if (180-eps < axisAngle && axisAngle < 180+eps ||
+                0-eps < axisAngle && axisAngle < 0-eps) {
+            return 'middle';
+        }
+        if (axisAngle < 180) {
+            return 'end';
+        } else {
+            return 'start';
+        }
+    }
+
+    function adaptAxesAnglesToSvg(axesAngles) {
+        return axesAngles.map(function(axisAngle) {
+            return svgHasADifferentZeroAngle( axisAngle * 180/Math.PI );
+        });
+    }
 
     function svgHasADifferentZeroAngle(angle) {
         if(angle >= 180) {
