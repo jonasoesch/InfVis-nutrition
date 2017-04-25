@@ -1,8 +1,14 @@
 
 function preprocess(d) {
     for (let e of Object.entries(d)) {
+        // Set empty strings to be value 0.
         if (e[1] === "") {
             d[e[0]] = 0;
+        }
+        // Convert all string numbers to integers.
+        let number = parseInt(e[1]);
+        if (!isNaN(number)) {
+            d[e[0]] = number;
         }
     }
     return d;
@@ -17,7 +23,7 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
             fat: entry["fat, total"],
             sugars: entry.sugars,
             protein: entry.protein,
-            // water: entry.water
+            water: entry.water
         };
     });
 
@@ -41,13 +47,14 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var R = d3.min([width, height])/2;
+    var r = 30;
     var center = [width/2, height/2];
 
     var radiusScales = axesNames.map(function(axis) {
         var max = d3.max(foods, function(food) { return food[axis]; });
         return d3.scaleLinear()
             .domain([0, max])
-            .range([0, R]);
+            .range([r, R]);
     });
 
     var radialLine = d3.radialLine()
@@ -65,13 +72,6 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
     let coordSystem = svg.append("g")
         .attr('class', "coord-system")
         .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
-
-    coordSystem.append("circle")
-        .attr('cx', 0)
-        .attr('cy', 0)
-        .attr('r', 3)
-        .attr('stroke', 'black')
-        .attr('fill', 'black');
 
     coordSystem.selectAll('path')
         .data(foods)
@@ -98,54 +98,4 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
             return angle + 180;
         }
     }
-
-    // coordSystem.selectAll('.axis')
-    //     .data(axesNames)
-    //     .enter()
-    //     .append('g')
-    //     .attr('class', 'axis')
-    //     .attr('transform', function(d, idx) {
-    //         var degrees = axesAngles[idx] * 180/Math.PI;
-    //         return 'rotate(' + degrees + ')';
-    //     }).call(d => d);
-
-    // coordSystem.selectAll('.axis')
-    //     .text('hello world')
-    //     .call(d => d);
-
-    //  svg.append("g")
-    //       .attr("id", "y_axis")
-    //       .attr("transform", `translate(${yAxisOrigin.x}, ${yAxisOrigin.y})`)
-    //       .call(yAxis);
-
-    // let dimensions = svg.selectAll('.dimension')
-    //     .data(axesNames)
-    //     .enter()
-    //     .append('g')
-    //     .attr('class', 'dimension')
-    //     .attr('transform', d => `translate(${xScale(d)})`);
-
-    /*
-    Careful, `this` is not bound correctly when using the arrow-function
-    d => console.log(this) doesn't do what it should
-     */
-    // dimensions
-    //     .append('g')
-    //     .attr('class', 'axis')
-    //     .each(function(d, i){
-    //         yScale[d].el = d3.select(this).call(d3.axisLeft(yScale[axesNames[i]]));
-    //     })
-    //     .append('text')
-    //     .style('text-anchor', 'middle')
-    //     .style('fill', '#fff')
-    //     .attr('y', -15)
-    //     .text( d => d);
-
-
-    //  dimensions
-    //      .attr('class', 'brush')
-    //      .each(function(d, i) {
-    //          yScale[d].brush = d3.brushY().on('brush', brush);
-    //          d3.select(this).call(yScale[d].brush);
-    //      });
 });
