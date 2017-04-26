@@ -36,7 +36,7 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
     var dTheta = 2*Math.PI / axesNames.length;
     var axesAngles = axesNames.map((key, idx) => idx * dTheta);
 
-    let margin = {top: 30, right: 30, bottom: 10, left: 30},
+    let margin = {top: 30, right: 30, bottom: 30, left: 30},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -69,6 +69,7 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
        return radialLine(wrangledData, i);
     };
 
+
     let coordSystem = svg.append("g")
         .attr('class', "coord-system")
         .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
@@ -77,11 +78,16 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
         .data(foods)
         .enter()
         .append("path")
-        .attr('stroke', 'red')
+        .attr('class', 'food-line')
         .attr('d', foodLine);
+    
+    coordSystem.append('path')
+        .attr('class', 'guiding-line')
+        .attr('d', createGuidingLine(axesAngles, R));
 
     var axes = axesNames.map(function(axis, idx) {
-        return d3.axisLeft(radiusScales[idx]);
+        return d3.axisLeft(radiusScales[idx])
+            .ticks(5);
     });
 
     var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
@@ -93,8 +99,8 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
             .call(axis)
             .append('text')
                 .attr('fill', 'black')
-                .attr('y', R+10)
-                .attr('transform', 'rotate(' + -adaptedAxesAngles[idx] + ',0,' + (R+10) + ')')
+                .attr('y', R+15)
+                .attr('transform', 'rotate(' + -adaptedAxesAngles[idx] + ',0,' + (R+15) + ')')
                 .attr('text-anchor', getTextAnchor(adaptedAxesAngles[idx]))
                 .text(axesNames[idx]);
     });
@@ -103,7 +109,7 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
     function getTextAnchor(axisAngle) {
         let eps = 1;
         if (180-eps < axisAngle && axisAngle < 180+eps ||
-                0-eps < axisAngle && axisAngle < 0-eps) {
+                0-eps < axisAngle && axisAngle < 0+eps) {
             return 'middle';
         }
         if (axisAngle < 180) {
@@ -125,5 +131,16 @@ d3.csv('generic_foods.csv', preprocess, function(err, csv) {
         } else {
             return angle + 180;
         }
+    }
+
+    function createGuidingLine(axesAngles, R) {
+        var zipped = axesAngles.map(function(axisAngle){
+            return [axisAngle, R];
+        });
+        zipped.push(zipped[0]);
+        var radialLine = d3.radialLine()
+            .angle(function(d) { return d[0]; })
+            .radius(function(d) { return d[1]; });
+        return radialLine(zipped);
     }
 });

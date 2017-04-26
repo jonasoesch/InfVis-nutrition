@@ -1,6 +1,7 @@
 ## TODO bis 3.5.
 
 * [] Claude: Spider-Graph (Glyphen) in schön :-)
+* [] Claude: Erklärender Spider-Graph als Legende
 * [] Claude: Anordnung der Glyphen nach Energiegehalt
 * [] Jonas: Auswahl der Lebensmittel
 * [] Jonas: Farbskala und Schriften für das Plakat
@@ -41,5 +42,5 @@
 * Ausgeglichenste (Vollmilchpulver)
 
 
-## Hilfen zur Datnanalyse
+## Hilfe zur Datenanalyse
 Das Scritp foodParallelCoords.js (mit foodParallelCoords.html) vom Repo https://github.com/jonasoesch/parallel-coordinates ist  benutzbar für Datenanalyse mit kategorischer Filterung und Einfärbung. Dort sind auch alle vorhandenen Dimensionen mit Einheiten zu finden.

@@ -11,3 +11,11 @@ text {
     font-size: 12px;
     font-weight: bold:
 }
+
+.guiding-line {
+    stroke: grey;
+}
+
+.food-line {
+    stroke: red;
+}
