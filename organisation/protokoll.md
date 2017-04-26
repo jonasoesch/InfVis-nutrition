@@ -1,9 +1,9 @@
 ## TODO bis 3.5.
 
-* Claude: Spider-Graph (Glyphen) in schön :-)
-* Claude: Anordnung der Glyphen nach Kohlenhydraten
-* Jonas: Auswahl der Lebensmittel
-* Jonas: Farbskala und Schriften für das Plakat
+* [] Claude: Spider-Graph (Glyphen) in schön :-)
+* [] Claude: Anordnung der Glyphen nach Kohlenhydraten
+* [] Jonas: Auswahl der Lebensmittel
+* [] Jonas: Farbskala und Schriften für das Plakat
 
 ## Dimensionen
 
