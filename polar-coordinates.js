@@ -77,7 +77,7 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
 
     let nrOfGuidingLines = 6;
-    let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r,R]);
+    let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r, R]);
     guidingLines.forEach(function (guidingLine, idx) {
         coordSystem.append('g')
             .append('path')
@@ -95,18 +95,29 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
 
 
     var axes = axesNames.map(function (axis, idx) {
-        return d3.axisLeft(radialScale[idx])
-            .ticks(5);
+        if (idx === 0) {
+            return d3.axisLeft(radialScale[idx])
+                .ticks(5)
+                .tickSize(0);
+        } else {
+            return d3.axisLeft(radialScale[idx])
+                .ticks(0)
+                .tickSize(0);
+        }
     });
 
     var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
 
     axes.forEach(function (axis, idx) {
-        coordSystem.append('g')
+        var axisSelection = coordSystem.append('g')
             .attr('class', 'axis')
             .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
-            .call(axis)
-            .append('text')
+            .call(axis);
+
+        axisSelection.selectAll("text")  
+            .attr("transform", "rotate(180)" );
+
+        axisSelection.append('text')
             .attr('class', 'axis-text')
             .attr('y', R + 15)
             .attr('transform', 'rotate(' + -adaptedAxesAngles[idx] + ',0,' + (R + 15) + ')')
@@ -146,7 +157,7 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         function zip(radius) {
             return axesAngles.map(axisAngle => [axisAngle, radius]);
         }
-        var radialIncrement = (minMaxRadius[1] - minMaxRadius[0]) / (nrOfGuidingLines-1);
+        var radialIncrement = (minMaxRadius[1] - minMaxRadius[0]) / (nrOfGuidingLines - 1);
         var zipped = [];
         for (var i = 0; i < nrOfGuidingLines; i++) {
             let radius = minMaxRadius[0] + i * radialIncrement;
