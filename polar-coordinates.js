@@ -53,7 +53,21 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
     var radialScaleMax = 100; // Make 100g the max for the radial scales.
     // var radialScaleMax = d3.max(foods, function(food) { return food[axis]; });
 
-    var radialScale = axesNames.map(function (axis) {
+    let coordSystem = svg.append("g")
+        .attr('class', "coord-system")
+        .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
+
+    let nrOfGuidingLines = 6;
+    let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r, R]);
+
+    guidingLines.forEach(function (guidingLine, idx) {
+        coordSystem.append('g')
+            .append('path')
+            .attr('class', 'guiding-line')
+            .attr('d', guidingLine);
+    });
+
+    var axesScales = axesNames.map(function (axis) {
         return d3.scaleLinear()
             .domain([0, radialScaleMax])
             .range([r, R]);
@@ -65,25 +79,11 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
 
     let foodLine = function (food, i) {
         var wrangledData = axesNames.map(function (key, idx) {
-            return [axesAngles[idx], radialScale[idx](food[key])];
+            return [axesAngles[idx], axesScales[idx](food[key])];
         });
         wrangledData.push(wrangledData[0]);
         return radialLine(wrangledData, i);
     };
-
-
-    let coordSystem = svg.append("g")
-        .attr('class', "coord-system")
-        .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
-
-    let nrOfGuidingLines = 6;
-    let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r, R]);
-    guidingLines.forEach(function (guidingLine, idx) {
-        coordSystem.append('g')
-            .append('path')
-            .attr('class', 'guiding-line')
-            .attr('d', guidingLine);
-    });
 
     coordSystem.append('g')
         .selectAll('path')
@@ -93,19 +93,15 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         .attr('class', 'food-line')
         .attr('d', foodLine);
 
+    // coordSystem.append('g')
+    //     .selectAll('polygon')
+    //     .data(foods)
+    //     .enter()
+    //     .append('polygon')
+    //     .attr('class', 'food-line')
+    //     .attr('points', foodLine);
 
-    var axes = axesNames.map(function (axis, idx) {
-        if (idx === 0) {
-            return d3.axisLeft(radialScale[idx])
-                .ticks(5)
-                .tickSize(0);
-        } else {
-            return d3.axisLeft(radialScale[idx])
-                .ticks(0)
-                .tickSize(0);
-        }
-    });
-
+    var axes = createAxes(axesNames, axesScales);
     var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
 
     axes.forEach(function (axis, idx) {
@@ -114,8 +110,8 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
             .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
             .call(axis);
 
-        axisSelection.selectAll("text")  
-            .attr("transform", "rotate(180)" );
+        axisSelection.selectAll("text")
+            .attr("transform", "rotate(180)");
 
         axisSelection.append('text')
             .attr('class', 'axis-text')
@@ -169,5 +165,19 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
             .angle(function (d) { return d[0]; })
             .radius(function (d) { return d[1]; });
         return zipped.map(line => radialLine(line));
+    }
+
+    function createAxes(axesNames, radialScale) {
+        return axesNames.map(function (axis, idx) {
+            if (idx === 0) {
+                return d3.axisLeft(radialScale[idx])
+                    .ticks(5)
+                    .tickSize(0);
+            } else {
+                return d3.axisLeft(radialScale[idx])
+                    .ticks(0)
+                    .tickSize(0);
+            }
+        });
     }
 });
