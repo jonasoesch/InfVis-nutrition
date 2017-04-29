@@ -58,7 +58,6 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
 
     let nrOfGuidingLines = 6;
     let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r, R]);
-
     guidingLines.forEach(function (guidingLine, idx) {
         coordSystem.append('g')
             .append('path')
@@ -66,24 +65,17 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
             .attr('d', guidingLine);
     });
 
-    var axesScales = axesNames.map(function (axis) {
-        return d3.scaleLinear()
-            .domain([0, radialScaleMax])
-            .range([r, R]);
-    });
-
-    var radialLine = d3.radialLine()
-        .angle(function (d) { return d[0]; })
-        .radius(function (d) { return d[1]; });
+    var radialScale = d3.scaleLinear()
+        .domain([0, radialScaleMax])
+        .range([r, R]);
 
     var getPolygon = function(food, idx) {
         return axesNames.map(function (axisName, idx) {
             var angle = axesAngles[idx] - Math.PI/2;
-            var radius = axesScales[idx](food[axisName]);
+            var radius = radialScale(food[axisName]);
             return [Math.cos(angle) * radius, Math.sin(angle) * radius];
         });
     };
-
     coordSystem.append('g')
         .selectAll('polygon')
         .data(foods)
@@ -94,9 +86,9 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         .attr('fill', (food, idx) => d3.schemeCategory10[idx+1])
         .attr('points', getPolygon);
 
-    var axes = createAxes(axesNames, axesScales);
-    var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
 
+    var axes = createAxes(axesNames, radialScale);
+    var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
     axes.forEach(function (axis, idx) {
         var axisSelection = coordSystem.append('g')
             .attr('class', 'axis')
@@ -113,7 +105,6 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
             .attr('text-anchor', getTextAnchor(adaptedAxesAngles[idx]))
             .text(axesNames[idx]);
     });
-
 
     function getTextAnchor(axisAngle) {
         let eps = 1;
@@ -163,11 +154,11 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
     function createAxes(axesNames, radialScale) {
         return axesNames.map(function (axis, idx) {
             if (idx === 0) {
-                return d3.axisLeft(radialScale[idx])
+                return d3.axisLeft(radialScale)
                     .ticks(5)
                     .tickSize(0);
             } else {
-                return d3.axisLeft(radialScale[idx])
+                return d3.axisLeft(radialScale)
                     .ticks(0)
                     .tickSize(0);
             }
