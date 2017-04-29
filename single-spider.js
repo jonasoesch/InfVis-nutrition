@@ -1,28 +1,25 @@
 
 function preprocess(d) {
-    d = {
-        name: d['name D'],
-        starch: d.starch,
-        sugars: d.sugars,
-        fibres: d['dietary fibres'],
-        fat: d["fat, total"],
-        protein: d.protein,
-        water: d.water,
-        // carbohydrates: d["carbohydrates, available"]
-    };
-
-    for (let e of Object.entries(d)) {
-        // Set empty strings to be value 0.
-        if (e[1] === "") {
-            d[e[0]] = 0;
-        }
-        // Convert all string that are numbers to number types.
-        let number = parseInt(e[1]);
-        if (!isNaN(number)) {
-            d[e[0]] = number;
+    function parseValue(value) {
+        if (value === '') {
+            return 0;
+        } else {
+            return parseInt(value);
         }
     }
-    return d;
+
+    foodObj = {
+        name: d['name D'],
+        starch: parseValue(d.starch),
+        sugars: parseValue(d.sugars),
+        fibres: parseValue(d['dietary fibres']),
+        fat: parseValue(d["fat, total"]),
+        protein: parseValue(d.protein),
+        water: parseValue(d.water),
+        // carbohydrates: parseValue(d["carbohydrates, available"])
+    };
+
+    return foodObj;
 }
 
 d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
