@@ -23,15 +23,14 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
             fibres: entry['dietary fibres'],
             fat: entry["fat, total"],
             protein: entry.protein,
-            water: entry.water
-            // carbohydrates: entry["carbohydrates, available"],
-            // kJ: entry["energy kJ"],
+            water: entry.water,
+            // carbohydrates: entry["carbohydrates, available"]
         };
     });
 
     let foods = [];
-    foods.push(allFoods[20]);
-    foods.push(allFoods[102]);
+    foods.push(allFoods[235]);
+    foods.push(allFoods[905]);
 
     var axesNames = d3.keys(foods[0]);
     var dTheta = 2 * Math.PI / axesNames.length;
@@ -77,29 +76,23 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         .angle(function (d) { return d[0]; })
         .radius(function (d) { return d[1]; });
 
-    let foodLine = function (food, i) {
-        var wrangledData = axesNames.map(function (key, idx) {
-            return [axesAngles[idx], axesScales[idx](food[key])];
+    var getPolygon = function(food, idx) {
+        return axesNames.map(function (axisName, idx) {
+            var angle = axesAngles[idx] - Math.PI/2;
+            var radius = axesScales[idx](food[axisName]);
+            return [Math.cos(angle) * radius, Math.sin(angle) * radius];
         });
-        wrangledData.push(wrangledData[0]);
-        return radialLine(wrangledData, i);
     };
 
     coordSystem.append('g')
-        .selectAll('path')
+        .selectAll('polygon')
         .data(foods)
         .enter()
-        .append("path")
-        .attr('class', 'food-line')
-        .attr('d', foodLine);
-
-    // coordSystem.append('g')
-    //     .selectAll('polygon')
-    //     .data(foods)
-    //     .enter()
-    //     .append('polygon')
-    //     .attr('class', 'food-line')
-    //     .attr('points', foodLine);
+        .append('polygon')
+        .attr('class', 'food-polygon')
+        .attr('stroke', (food, idx) => d3.schemeCategory10[idx+1])
+        .attr('fill', (food, idx) => d3.schemeCategory10[idx+1])
+        .attr('points', getPolygon);
 
     var axes = createAxes(axesNames, axesScales);
     var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
