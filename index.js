@@ -6,7 +6,7 @@ function dd(obj){
     }
 }
 
-d3.tsv('food-data.txt', function(err, tsv) {
+d3.tsv('data/food-data.txt', function(err, tsv) {
 
 
     let foods_full = tsv.map( function(entry) { return {
