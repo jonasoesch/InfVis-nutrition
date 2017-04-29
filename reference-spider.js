@@ -1,4 +1,4 @@
-d3.csv('generic_foods.csv', function (err, csv) {
+d3.csv('data/generic_foods.csv', function (err, csv) {
 
     let allFoods = csv.map(function (entry) {
         return {

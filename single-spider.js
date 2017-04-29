@@ -1,11 +1,22 @@
 
 function preprocess(d) {
+    d = {
+        name: d['name D'],
+        starch: d.starch,
+        sugars: d.sugars,
+        fibres: d['dietary fibres'],
+        fat: d["fat, total"],
+        protein: d.protein,
+        water: d.water,
+        // carbohydrates: d["carbohydrates, available"]
+    };
+
     for (let e of Object.entries(d)) {
         // Set empty strings to be value 0.
         if (e[1] === "") {
             d[e[0]] = 0;
         }
-        // Convert all string numbers to integers.
+        // Convert all string that are numbers to number types.
         let number = parseInt(e[1]);
         if (!isNaN(number)) {
             d[e[0]] = number;
@@ -14,25 +25,16 @@ function preprocess(d) {
     return d;
 }
 
-d3.csv('generic_foods.csv', preprocess, function (err, csv) {
+d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
 
-    let allFoods = csv.map(function (entry) {
-        return {
-            starch: entry.starch,
-            sugars: entry.sugars,
-            fibres: entry['dietary fibres'],
-            fat: entry["fat, total"],
-            protein: entry.protein,
-            water: entry.water,
-            // carbohydrates: entry["carbohydrates, available"]
-        };
-    });
+    var includedFoods = [
+        'Bohne, grün, getrocknet',
+        'Pistazie',
+        'Vollmilchpulver'
+    ];
+    foods = foods.filter(food => includedFoods.indexOf(food.name) !== -1);
 
-    let foods = [];
-    foods.push(allFoods[235]);
-    foods.push(allFoods[905]);
-
-    var axesNames = d3.keys(foods[0]);
+    var axesNames = d3.keys(foods[0]).filter(key => key !== 'name');
     var dTheta = 2 * Math.PI / axesNames.length;
     var axesAngles = axesNames.map((key, idx) => idx * dTheta);
 
@@ -69,9 +71,9 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         .domain([0, radialScaleMax])
         .range([r, R]);
 
-    var getPolygon = function(food, idx) {
+    var getPolygon = function (food, idx) {
         return axesNames.map(function (axisName, idx) {
-            var angle = axesAngles[idx] - Math.PI/2;
+            var angle = axesAngles[idx] - Math.PI / 2;
             var radius = radialScale(food[axisName]);
             return [Math.cos(angle) * radius, Math.sin(angle) * radius];
         });
@@ -82,8 +84,8 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
         .enter()
         .append('polygon')
         .attr('class', 'food-polygon')
-        .attr('stroke', (food, idx) => d3.schemeCategory10[idx+1])
-        .attr('fill', (food, idx) => d3.schemeCategory10[idx+1])
+        .attr('stroke', (food, idx) => d3.schemeCategory10[idx + 1])
+        .attr('fill', (food, idx) => d3.schemeCategory10[idx + 1])
         .attr('points', getPolygon);
 
 
@@ -153,9 +155,9 @@ d3.csv('generic_foods.csv', preprocess, function (err, csv) {
 
     function createAxes(axesNames, radialScale) {
         return axesNames.map(function (axis, idx) {
-                return d3.axisLeft(radialScale)
-                    .ticks(0)
-                    .tickSize(0);
+            return d3.axisLeft(radialScale)
+                .ticks(0)
+                .tickSize(0);
         });
     }
 });
