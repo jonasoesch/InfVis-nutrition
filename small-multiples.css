@@ -8,7 +8,7 @@ path {
 
 text {
     font-family: Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 12px;
+    font-size: 10px;
 }
 
 .axis {
@@ -21,6 +21,11 @@ text {
     stroke: black;
     stroke-width: 0.5px;
     opacity: 0.2;
+}
+
+.axis-text {
+    fill: black;
+    font-size: 12px;
 }
 
 .food-polygon {

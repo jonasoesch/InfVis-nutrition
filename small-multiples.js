@@ -21,40 +21,68 @@ function preprocess(d) {
 
 d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
 
-    var rows = 20;
-    var energyRange = d3.extent(foods.map(food => food.energy));
-    var energyInterval = (energyRange[1] - energyRange[0]) / rows;
+    var rows = 15;
+    var energyDomain = d3.extent(foods.map(food => food.energy));
+    var energyInterval = (energyDomain[1] - energyDomain[0]) / rows;
 
     // Calculate the grid positions of the foods.
     foods.sort(function (a, b) {
         return a.energy - b.energy;
     });
 
-    var columns = addGridCoordinates(foods, energyRange[0], energyInterval);
+    var columns = addGridCoordinates(foods, energyDomain[0], energyInterval);
     var cellHeight = 50,
         cellWidth = 50,
         chartMargin = { top: 5, right: 5, bottom: 5, left: 5 },
         chartWidth = cellWidth - chartMargin.right - chartMargin.left,
         chartHeight = cellHeight - chartMargin.top - chartMargin.bottom,
         gridWidth = cellWidth * columns,
-        gridHeight = cellHeight * rows ;
+        gridHeight = cellHeight * rows,
+        energyAxisWidth = 30,
+        svgInnerMargin = 20,
+        svgWidth = gridWidth + energyAxisWidth + svgInnerMargin * 2,
+        svgHeight = gridHeight + svgInnerMargin * 2;
 
     let svg = d3.select("body").append("svg")
-        .attr("width", gridWidth)
-        .attr("height", gridHeight)
-        .append("g")
-        .attr('class', 'grid');
+        .attr("width", svgWidth)
+        .attr("height", svgHeight);
+    let gridSelection = svg.append("g")
+        .attr('class', 'grid')
+        .attr('transform', 'translate(' + (energyAxisWidth + svgInnerMargin) + ',' + svgInnerMargin + ')');
+    let axisSelection = svg.append("g")
+        .attr('class', 'energy-axis')
+        .attr('transform', 'translate(' + (svgInnerMargin) + ',' + svgInnerMargin + ')');
 
     var axesNames = d3.keys(foods[0]).filter(key => key !== 'name' && key !== 'energy' && key !== 'gridCoords'),
         dTheta = 2 * Math.PI / axesNames.length,
         axesAngles = axesNames.map((key, idx) => idx * dTheta),
         radialScaleMax = 100,
         R = d3.min([chartWidth, chartHeight]) / 2,
-        // XXX determine inner radius empirically.
+        // XXX Adapt the inner radius to the total size of the spider charts.
         r = 5,
         nrOfGuidingLines = 6;
 
+    addEnergyAxis();
     foods.forEach((food, idx) => addSpiderChartToGrid(food, idx));
+
+    function addEnergyAxis() {
+        var scale = d3.scaleLinear()
+            .domain(energyDomain)
+            .range([0, gridHeight]);
+
+        var tickValues = Array(rows).fill(0).map((value, idx) => energyDomain[0] + idx * energyInterval);
+        tickValues.push(energyDomain[1]);
+        var axis = d3.axisRight(scale)
+            .tickValues(tickValues);
+
+        axisSelection.call(axis);
+
+        axisSelection.append('text')
+            .attr('class', 'axis-text')
+            .attr('transform', 'translate(-10, ' + gridHeight/2 + ') rotate(-90)')
+            .attr('text-anchor', 'middle')
+            .text('Energy (kcal)');
+    }
 
     function addSpiderChartToGrid(food, idx) {
 
@@ -62,7 +90,7 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
             (food.gridCoords[1] - 1) * cellHeight + cellHeight / 2,
             (food.gridCoords[0] - 1) * cellWidth + cellWidth / 2];
 
-        let spiderChart = svg.append("g")
+        let spiderChart = gridSelection.append("g")
             .attr('class', "spider-chart")
             .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
 
@@ -104,19 +132,6 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
             var radius = radialScale(food[axisName]);
             return [Math.cos(angle) * radius, Math.sin(angle) * radius];
         });
-    }
-
-    function getTextAnchor(axisAngle) {
-        let eps = 1;
-        if (180 - eps < axisAngle && axisAngle < 180 + eps ||
-            0 - eps < axisAngle && axisAngle < 0 + eps) {
-            return 'middle';
-        }
-        if (axisAngle < 180) {
-            return 'end';
-        } else {
-            return 'start';
-        }
     }
 
     function adaptAxesAnglesToSvg(axesAngles) {
@@ -165,7 +180,7 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
         var column = 1;
         var maxColumns = 1;
         for (let food of foods) {
-            if (food.energy > row * energyInterval + minEnergy)  {
+            if (food.energy > row * energyInterval + minEnergy) {
                 row++;
                 if (column > maxColumns) {
                     maxColumns = column;
