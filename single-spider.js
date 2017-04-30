@@ -1,4 +1,3 @@
-
 function preprocess(d) {
     function parseValue(value) {
         if (value === '') {
@@ -8,7 +7,7 @@ function preprocess(d) {
         }
     }
 
-    foodObj = {
+    return {
         name: d['name D'],
         starch: parseValue(d.starch),
         sugars: parseValue(d.sugars),
@@ -18,8 +17,6 @@ function preprocess(d) {
         water: parseValue(d.water),
         // carbohydrates: parseValue(d["carbohydrates, available"])
     };
-
-    return foodObj;
 }
 
 d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
@@ -52,12 +49,12 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
     // var radialScaleMax = d3.max(foods, function(food) { return food[axis]; });
 
     let coordSystem = svg.append("g")
-        .attr('class', "coord-system")
+        .attr('class', "spider-chart")
         .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
 
     let nrOfGuidingLines = 6;
     let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r, R]);
-    guidingLines.forEach(function (guidingLine, idx) {
+    guidingLines.forEach(function (guidingLine) {
         coordSystem.append('g')
             .append('path')
             .attr('class', 'guiding-line')
@@ -68,7 +65,7 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
         .domain([0, radialScaleMax])
         .range([r, R]);
 
-    var getPolygon = function (food, idx) {
+    var getPolygon = function (food) {
         return axesNames.map(function (axisName, idx) {
             var angle = axesAngles[idx] - Math.PI / 2;
             var radius = radialScale(food[axisName]);
