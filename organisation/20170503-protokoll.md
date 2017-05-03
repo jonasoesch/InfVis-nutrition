@@ -1,12 +1,12 @@
 Claude
-- 50 kCal bins
+[*] 50 kCal bins
+[*] Spinnenweben weg nehmen (nur small)
+[*] Transparenz weg (nur small)
+[*] Weisses Hexagon in der Mitte nach vorne
+[*] Punkte an die Ecken
 - Farbe nach Kategorie
-- Spinnenweben weg nehmen (nur small)
-- Punkte an die Ecken
-- Weisses Hexagon in der Mitte nach vorne
-- Transparenz weg (nur small)
-- Kein Referenzchart nötig
-- Achsenbeschriftung (nur gross)
+- Axen des spider charts sind alle leicht vor den Enden der Datenpunkte. Korrigieren.
+[*] Achsenbeschriftung (nur gross)
 - Part 1 (GZSZ-Style)
     - Ziel
     - Fragestellung
