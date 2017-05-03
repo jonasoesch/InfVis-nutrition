@@ -35,3 +35,7 @@ text {
     stroke-opacity: 0.9;
     stroke-width: 0.5px;
 }
+
+.food-name {
+    font-size: 5px;
+}

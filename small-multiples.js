@@ -86,6 +86,7 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
 
     function addSpiderChartToGrid(food, idx) {
 
+
         var center = [
             (food.gridCoords[1] - 1) * cellHeight + cellHeight / 2,
             (food.gridCoords[0] - 1) * cellWidth + cellWidth / 2];
@@ -114,7 +115,12 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
             .attr('class', 'food-polygon')
             // .attr('stroke', (food, idx) => d3.schemeCategory10[idx + 1])
             // .attr('fill', (food, idx) => d3.schemeCategory10[idx + 1])
-            .attr('points', getPolygon(food, radialScale));
+            .attr('points', getPolygon(food, radialScale))
+
+        
+        // Label for the name of each food
+        spiderChart.append("text").text(cleanName(food.name)).attr("transform", "translate(-20,25)").attr("class", "food-name");
+
 
         var axes = createAxes(axesNames, radialScale);
         var adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
@@ -123,7 +129,12 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
                 .attr('class', 'axis')
                 .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
                 .call(axis);
+
         });
+    }
+
+    function cleanName(name) {
+        return name.split(',')[0];
     }
 
     function getPolygon(food, radialScale) {
