@@ -120,11 +120,6 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
 
         });
 
-        spiderChart.append('g')
-            .append('polygon')
-            .attr('class', 'center-polygon')
-            .attr('points', getCenterPolygon(axesAngles, r));
-
         let polygonPoints = getPolygonPoints(food, axesNames, axesAngles, radialScale);
         spiderChart.append('g')
             .append('polygon')
@@ -132,6 +127,12 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
             // .attr('stroke', (food, idx) => d3.schemeCategory10[idx + 1])
             // .attr('fill', (food, idx) => d3.schemeCategory10[idx + 1])
             .attr('points', polygonPoints);
+
+
+        spiderChart.append('g')
+            .append('polygon')
+            .attr('class', 'center-polygon')
+            .attr('points', getCenterPolygon(axesAngles, r));
 
         // polygonPoints.forEach(function (point) {
         //     spiderChart.append('circle')
