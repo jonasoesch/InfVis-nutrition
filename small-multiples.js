@@ -8,7 +8,7 @@ function preprocess(d) {
     }
 
     return {
-        name: d['name D'],
+        name: d['name changed'],
         starch: parseValue(d.starch),
         sugars: parseValue(d.sugars),
         fibres: parseValue(d['dietary fibres']),
@@ -19,7 +19,7 @@ function preprocess(d) {
     };
 }
 
-d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
+d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
 
     // With bin size given.
     var binSize = 50;
@@ -142,12 +142,9 @@ d3.tsv('data/selected-foods.txt', preprocess, function (err, foods) {
         // });
 
         // Label for the name of each food
-        spiderChart.append("text").text(cleanName(food.name)).attr("transform", "translate(-20,25)").attr("class", "food-name");
+        spiderChart.append("text").text(food.name).attr("transform", "translate(-20,25)").attr("class", "food-name");
     }
 
-    function cleanName(name) {
-        return name.split(',')[0];
-    }
 
     function getPolygonPoints(food, axesNames, axesAngles, radialScale) {
         return axesNames.map(function (axisName, idx) {
