@@ -65,14 +65,26 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
     drawPolygonPoints(pointsGroup);
 
 
+
+
     function drawPolygons(polygonsGroup) {
+
         foods.forEach(function (food, idx) {
+            console.log(getPolygonPoints(food));
             polygonsGroup.append('polygon')
                 .attr('class', 'food-polygon')
                 .attr('stroke', d3.schemeCategory10[idx])
                 .attr('fill', d3.schemeCategory10[idx])
                 .attr('points', getPolygonPoints(food));
 
+            getPolygonPoints(food).forEach(function(point, index) {
+                polygonsGroup.append('circle')
+                    .attr('class', 'endpoint')
+                    .attr('cx', point[0])
+                    .attr('cy', point[1])
+                    .attr('r', 4)
+                    .attr('fill', d3.schemeCategory10[idx]);
+            });
         });
     }
 
@@ -83,7 +95,8 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
             var axisSelection = spiderChart.append('g')
                 .attr('class', 'axis')
                 .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
-                .call(axis);
+                .call(axis)
+                .selectAll('text');
 
             axisSelection.selectAll("text")
                 .attr("transform", "rotate(180)");
