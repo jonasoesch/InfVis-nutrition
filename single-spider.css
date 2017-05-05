@@ -3,27 +3,34 @@ path {
 }
 
 text {
-    font-family: Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 12px;
-    
+    letter-spacing: 1.5px;
 }
 
-.axis {
-    stroke: #aaa;
+.tick text {
+    font-size: 10px;
+    font-weight: "Normal";
 }
 
-.axis-text {
+
+.axis .domain, .guiding-line, .center-polygon {
+    stroke: #C7B3A4;
+    stroke-width: 1px;
+}
+
+
+.axis-text, .tick text {
+    fill: #90715A;
     opacity: 1;
 }
 
-.guiding-line {
-    stroke: #aaa;
+.axis-text {
+    font-weight: 600;
 }
 
 .center-polygon {
     fill: white;
-    stroke: #555;
-    stroke-width: 1;
 }
 
 .food-polygon {

@@ -15,11 +15,30 @@ function preprocess(d) {
         fat: parseValue(d["fat, total"]),
         protein: parseValue(d.protein),
         water: parseValue(d.water),
+        category: d['category'],
         // carbohydrates: parseValue(d["carbohydrates, available"])
     };
 }
 
-d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
+
+
+var categoryColors = [
+    '#b2df8a', // light green
+    '#fb9a99', // rose
+    '#cab2d6', // mauve
+    '#a6cee3', // light blue
+    '#fdbf6f', // yellow
+    '#e31a1c', // red
+    '#6a3d9a', // violet
+    '#33a02c', // dark green 
+    '#1f78b4', // dark blue
+    '#ff7f00', // orange
+];
+
+
+d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
+
+    let mainCategories = getMainCategories(foods);
 
     let includedFoods = [
         'Bohne, grün, getrocknet',
@@ -28,8 +47,14 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
     ];
     foods = foods.filter(food => includedFoods.indexOf(food.name) !== -1);
 
+    
+
+    let colorScale = d3.scaleOrdinal()
+        .domain(mainCategories)
+        .range(categoryColors);
+
     // 'Global' variables used in most methods.
-    let axesNames = d3.keys(foods[0]).filter(key => key !== 'name');
+    let axesNames = d3.keys(foods[0]).filter( function(key)  { return (key !== 'name' && key !== 'category') });
     let dTheta = 2 * Math.PI / axesNames.length;
     let axesAngles = axesNames.map((key, idx) => idx * dTheta);
     let margin = { top: 30, right: 30, bottom: 30, left: 30 },
@@ -70,11 +95,12 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
     function drawPolygons(polygonsGroup) {
 
         foods.forEach(function (food, idx) {
-            console.log(getPolygonPoints(food));
+            
+
             polygonsGroup.append('polygon')
                 .attr('class', 'food-polygon')
-                .attr('stroke', d3.schemeCategory10[idx])
-                .attr('fill', d3.schemeCategory10[idx])
+                .attr('stroke', colorScale(food.category))
+                .attr('fill', colorScale(food.category))
                 .attr('points', getPolygonPoints(food));
 
             getPolygonPoints(food).forEach(function(point, index) {
@@ -83,7 +109,7 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
                     .attr('cx', point[0])
                     .attr('cy', point[1])
                     .attr('r', 4)
-                    .attr('fill', d3.schemeCategory10[idx]);
+                    .attr('fill', colorScale(food.category));
             });
         });
     }
@@ -95,11 +121,14 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
             var axisSelection = spiderChart.append('g')
                 .attr('class', 'axis')
                 .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
-                .call(axis)
-                .selectAll('text');
+                .call(axis);
 
             axisSelection.selectAll("text")
-                .attr("transform", "rotate(180)");
+                .attr("transform", "rotate(180), translate(-3, -3)")
+
+
+            axisSelection.selectAll(".domain")
+                .attr('stroke', '');
 
             axisSelection.append('text')
                 .attr('class', 'axis-text')
@@ -214,3 +243,14 @@ d3.csv('data/generic_foods.csv', preprocess, function (err, foods) {
         }
     }
 });
+
+
+function getMainCategories(foods) {
+    let categories = [];
+    foods.forEach(function (food) {
+        if (categories.indexOf(food.category) === -1) {
+            categories.push(food.category);
+        }
+    });
+    return categories;
+}
