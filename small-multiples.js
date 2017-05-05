@@ -57,7 +57,7 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
 
     foods.sort((a, b) => a.energy - b.energy);
     let axesNames = d3.keys(foods[0]).filter(key =>
-        key !== 'name' && key !== 'energy' && key !== 'gridCoords' && key !== 'categories');
+        key !== 'name' && key !== 'energy' && key !== 'gridCoords' && key !== 'categories' && key !== 'category');
     let mainCategories = getMainCategories(foods);
     let colorScale = d3.scaleOrdinal()
         .domain(mainCategories)
