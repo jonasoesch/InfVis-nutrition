@@ -1,12 +1,5 @@
 function preprocess(d) {
-    function parseValue(value) {
-        if (value === '') {
-            return 0;
-        } else {
-            return parseInt(value);
-        }
-    }
-
+    d = augmentWithCategories(d);
     return {
         name: d['name changed'],
         starch: parseValue(d.starch),
@@ -15,27 +8,64 @@ function preprocess(d) {
         fat: parseValue(d["fat, total"]),
         protein: parseValue(d.protein),
         water: parseValue(d.water),
-        energy: parseValue(d['energy kcal'])
+        energy: parseValue(d['energy kcal']),
+        category: d.category11
     };
+
+    function parseValue(value) {
+        if (value === '') {
+            return 0;
+        } else {
+            return parseInt(value);
+        }
+    }
+
+    function augmentWithCategories(food) {
+        var categoryString = food['category D'];
+        var categoryHierarchies = categoryString.split(';');
+        categoryHierarchies.forEach(function (hierarchyString, idx1, hierarchies) {
+            var propertyName = 'category' + (idx1 + 1);
+            hierarchyString.split('/').forEach(function (category, idx2, categories) {
+                food[propertyName + (idx2 + 1)] = category;
+            });
+        });
+        return food;
+    }
 }
+
+var categoryColors = [
+    "#6c8137",
+    "#9d53d6",
+    "#73d350",
+    "#cc5394",
+    "#ced149",
+    "#8f81c3",
+    "#c78938",
+    "#60b4cf",
+    "#d34a3a",
+    "#68d9a6",
+    "#ba7569",
+    "#4a8b6d",
+    "#c7d193",
+    // there were 16 main categories the last time i checked. Too many!
+    "#000000",
+    "#000000",
+    "#000000",
+];
 
 d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
 
-    // With bin size given.
-    var binSize = 50;
-    var energyDomain = [0, d3.max(foods.map(food => food.energy))];
-    var energyInterval = binSize;
-    // With number of rows given
-    // var rows = 15;
-    // var energyDomain = d3.extent(foods.map(food => food.energy));
-    // var energyInterval = (energyDomain[1] - energyDomain[0]) / rows;
-
-    foods.sort(function (a, b) {
-        return a.energy - b.energy;
-    });
-
-    var [rows, columns] = addGridCoordinates(foods, energyDomain[0], energyInterval);
-    var cellHeight = 50,
+    foods.sort((a, b) => a.energy - b.energy);
+    let axesNames = d3.keys(foods[0]).filter(key =>
+        key !== 'name' && key !== 'energy' && key !== 'gridCoords' && key !== 'categories');
+    let mainCategories = getMainCategories(foods);
+    let colorScale = d3.scaleOrdinal()
+        .domain(mainCategories)
+        .range(categoryColors);
+    let energyDomain = [0, d3.max(foods.map(food => food.energy))];
+    let binSize = 50;
+    let [rows, columns] = addGridCoordinates(foods, energyDomain[0], binSize);
+    let cellHeight = 50,
         cellWidth = 50,
         chartMargin = { top: 5, right: 5, bottom: 5, left: 5 },
         chartWidth = cellWidth - chartMargin.right - chartMargin.left,
@@ -45,7 +75,13 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
         energyAxisWidth = 30,
         svgInnerMargin = 20,
         svgWidth = gridWidth + energyAxisWidth + svgInnerMargin * 2,
-        svgHeight = gridHeight + svgInnerMargin * 2;
+        svgHeight = gridHeight + svgInnerMargin * 2,
+        dTheta = 2 * Math.PI / axesNames.length,
+        axesAngles = axesNames.map((key, idx) => idx * dTheta),
+        radialScaleMax = 100,
+        R = d3.min([chartWidth, chartHeight]) / 2,
+        r = 3,
+        nrOfGuidingLines = 6;
 
     let svg = d3.select("body").append("svg")
         .attr("width", svgWidth)
@@ -57,14 +93,6 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
         .attr('class', 'energy-axis')
         .attr('transform', 'translate(' + (svgInnerMargin) + ',' + svgInnerMargin + ')');
 
-    let axesNames = d3.keys(foods[0]).filter(key => key !== 'name' && key !== 'energy' && key !== 'gridCoords'),
-        dTheta = 2 * Math.PI / axesNames.length,
-        axesAngles = axesNames.map((key, idx) => idx * dTheta),
-        radialScaleMax = 100,
-        R = d3.min([chartWidth, chartHeight]) / 2,
-        r = 3,
-        nrOfGuidingLines = 6;
-
     addEnergyAxis();
     foods.forEach((food, idx) => addSpiderChart(food, gridSelection));
 
@@ -74,7 +102,7 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
             .range([0, gridHeight]);
 
         let tickValues = Array(rows).fill(0)
-            .map((value, idx) => energyDomain[0] + idx * energyInterval);
+            .map((value, idx) => energyDomain[0] + idx * binSize);
         tickValues.push(energyDomain[1]);
         let axis = d3.axisRight(scale)
             .tickValues(tickValues);
@@ -124,8 +152,8 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
         spiderChart.append('g')
             .append('polygon')
             .attr('class', 'food-polygon')
-            // .attr('stroke', (food, idx) => d3.schemeCategory10[idx + 1])
-            // .attr('fill', (food, idx) => d3.schemeCategory10[idx + 1])
+            .attr('stroke', colorScale(food.category))
+            .attr('fill', colorScale(food.category))
             .attr('points', polygonPoints);
 
 
@@ -219,5 +247,14 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
         }
         return [row, maxColumns];
     }
-
 });
+
+function getMainCategories(foods) {
+    let categories = [];
+    foods.forEach(function (food) {
+        if (categories.indexOf(food.category) === -1) {
+            categories.push(food.category);
+        }
+    });
+    return categories;
+}

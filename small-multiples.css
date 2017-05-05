@@ -26,8 +26,8 @@ text {
 
 .food-polygon {
     fill-opacity: 1;
-    fill: blue;
-    stroke: blue;
+    /*fill: blue;*/
+    /*stroke: blue;*/
     stroke-opacity: 1;
     stroke-width: 0.8px;
 }
