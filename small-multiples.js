@@ -229,24 +229,55 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
         });
     }
 
-    // Grid coordinates are [row, column]
     function addGridCoordinates(foods, minEnergy, energyInterval) {
-        var row = 1;
-        var column = 1;
-        var maxColumns = 1;
+        let row = 1;
+        let maxColumns = 1;
+        let currentRow = [];
         for (let food of foods) {
             if (food.energy > row * energyInterval + minEnergy) {
+                // Go to new row but first sort foods on current row according to categories.
+                // Using the ordreing of the main categories list.
+                assignColumInOrderOfCategories(currentRow, row);
                 row++;
-                if (column > maxColumns) {
-                    maxColumns = column;
+                if (currentRow.length > maxColumns) {
+                    maxColumns = currentRow.length;
                 }
-                column = 1;
+                currentRow = [];
             }
-            food.gridCoords = [row, column];
-            column++;
+            currentRow.push(food);
         }
+        // once more for the last row.
+        assignColumInOrderOfCategories(currentRow, row);
         return [row, maxColumns];
+
+        function assignColumInOrderOfCategories(foodsOfRow, row) {
+            let column = 1;
+            for (let category of mainCategories) {
+                for (let food of foodsOfRow) {
+                    if (food.category === category) {
+                        food.gridCoords = [row, column++];
+                    }
+                }
+            }
+        }
     }
+    // function addGridCoordinates(foods, minEnergy, energyInterval) {
+    //     var row = 1;
+    //     var column = 1;
+    //     var maxColumns = 1;
+    //     for (let food of foods) {
+    //         if (food.energy > row * energyInterval + minEnergy) {
+    //             row++;
+    //             if (column > maxColumns) {
+    //                 maxColumns = column;
+    //             }
+    //             column = 1;
+    //         }
+    //         food.gridCoords = [row, column];
+    //         column++;
+    //     }
+    //     return [row, maxColumns];
+    // }
 });
 
 function getMainCategories(foods) {
