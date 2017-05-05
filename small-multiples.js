@@ -9,7 +9,7 @@ function preprocess(d) {
         protein: parseValue(d.protein),
         water: parseValue(d.water),
         energy: parseValue(d['energy kcal']),
-        category: d.category11
+        category: d.category
     };
 
     function parseValue(value) {
@@ -33,24 +33,35 @@ function preprocess(d) {
     }
 }
 
+
+/*
+ *
+0 "Vegetables"
+1 "Fruit"
+2 "Diverse"
+3 "Diary"
+4 "Cereal"
+5 "Meat"
+6 "Sweets"
+7 "Nuts"
+8 "Fish"
+9 "Bread"
+10 "Snacks"
+
+*/
+
+
 var categoryColors = [
-    "#6c8137",
-    "#9d53d6",
-    "#73d350",
-    "#cc5394",
-    "#ced149",
-    "#8f81c3",
-    "#c78938",
-    "#60b4cf",
-    "#d34a3a",
-    "#68d9a6",
-    "#ba7569",
-    "#4a8b6d",
-    "#c7d193",
-    // there were 16 main categories the last time i checked. Too many!
-    "#000000",
-    "#000000",
-    "#000000",
+    '#b2df8a', // light green
+    '#fb9a99', // rose
+    '#cab2d6', // mauve
+    '#a6cee3', // light blue
+    '#fdbf6f', // yellow
+    '#e31a1c', // red
+    '#6a3d9a', // violet
+    '#33a02c', // dark green 
+    '#1f78b4', // dark blue
+    '#ff7f00', // orange
 ];
 
 d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
@@ -59,13 +70,14 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
     let axesNames = d3.keys(foods[0]).filter(key =>
         key !== 'name' && key !== 'energy' && key !== 'gridCoords' && key !== 'categories' && key !== 'category');
     let mainCategories = getMainCategories(foods);
+    console.log(mainCategories);
     let colorScale = d3.scaleOrdinal()
         .domain(mainCategories)
         .range(categoryColors);
     let energyDomain = [0, d3.max(foods.map(food => food.energy))];
     let binSize = 50;
     let [rows, columns] = addGridCoordinates(foods, energyDomain[0], binSize);
-    let cellHeight = 50,
+    let cellHeight = 60,
         cellWidth = 50,
         chartMargin = { top: 5, right: 5, bottom: 5, left: 5 },
         chartWidth = cellWidth - chartMargin.right - chartMargin.left,
@@ -119,8 +131,8 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
     function addSpiderChart(food, svgSelection) {
 
         let center = [
-            (food.gridCoords[1] - 1) * cellHeight + cellHeight / 2,
-            (food.gridCoords[0] - 1) * cellWidth + cellWidth / 2];
+            (food.gridCoords[1] - 1) * cellWidth + cellWidth / 2,
+            (food.gridCoords[0] - 1) * cellHeight + cellHeight / 2];
 
         let spiderChart = svgSelection.append("g")
             .attr('class', "spider-chart")
@@ -170,7 +182,7 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
         // });
 
         // Label for the name of each food
-        spiderChart.append("text").text(food.name).attr("transform", "translate(-20,25)").attr("class", "food-name");
+        spiderChart.append("text").text(food.name).attr("transform", "translate(-20,30)").attr("class", "food-name");
     }
 
 
