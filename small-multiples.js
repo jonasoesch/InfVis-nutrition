@@ -1,5 +1,4 @@
 function preprocess(d) {
-    d = augmentWithCategories(d);
     return {
         name: d['name changed'],
         starch: parseValue(d.starch),
@@ -18,18 +17,6 @@ function preprocess(d) {
         } else {
             return parseInt(value);
         }
-    }
-
-    function augmentWithCategories(food) {
-        var categoryString = food['category D'];
-        var categoryHierarchies = categoryString.split(';');
-        categoryHierarchies.forEach(function (hierarchyString, idx1, hierarchies) {
-            var propertyName = 'category' + (idx1 + 1);
-            hierarchyString.split('/').forEach(function (category, idx2, categories) {
-                food[propertyName + (idx2 + 1)] = category;
-            });
-        });
-        return food;
     }
 }
 
@@ -70,7 +57,6 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
     let axesNames = d3.keys(foods[0]).filter(key =>
         key !== 'name' && key !== 'energy' && key !== 'gridCoords' && key !== 'categories' && key !== 'category');
     let mainCategories = getMainCategories(foods);
-    console.log(mainCategories);
     let colorScale = d3.scaleOrdinal()
         .domain(mainCategories)
         .range(categoryColors);
@@ -138,26 +124,18 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
             .attr('class', "spider-chart")
             .attr("transform", "translate(" + center[0] + "," + center[1] + ")");
 
-        // let guidingLines = createGuidingLines(axesAngles, nrOfGuidingLines, [r, R]);
-        // guidingLines.forEach(function (guidingLine, idx) {
-        //     spiderChart.append('g')
-        //         .append('path')
-        //         .attr('class', 'guiding-line')
-        //         .attr('d', guidingLine);
-        // });
-
         let radialScale = d3.scaleLinear()
             .domain([0, radialScaleMax])
             .range([r, R]);
 
-        let axes = createAxes(axesNames, radialScale);
         let adaptedAxesAngles = adaptAxesAnglesToSvg(axesAngles);
-        axes.forEach(function (axis, idx) {
+        axesNames.forEach(function (axis, idx) {
             var axisSelection = spiderChart.append('g')
                 .attr('class', 'axis')
-                .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')')
-                .call(axis);
-
+                .attr('transform', 'rotate(' + adaptedAxesAngles[idx] + ')');
+            let extend = radialScale.range();
+            axisSelection.append('path')
+            .attr('d', 'M0,' + extend[0] + 'H0V' + extend[1]);
         });
 
         let polygonPoints = getPolygonPoints(food, axesNames, axesAngles, radialScale);
@@ -231,14 +209,6 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
             .angle(function (d) { return d[0]; })
             .radius(function (d) { return d[1]; });
         return zipped.map(line => radialLine(line));
-    }
-
-    function createAxes(axesNames, radialScale) {
-        return axesNames.map(function (axis, idx) {
-            return d3.axisLeft(radialScale)
-                .ticks(0)
-                .tickSize(0);
-        });
     }
 
     function addGridCoordinates(foods, minEnergy, energyInterval) {
