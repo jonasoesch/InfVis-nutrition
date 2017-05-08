@@ -1,0 +1,46 @@
+<svg width="960" height="500">
+
+	<style>
+circle {
+    opacity: 0.3
+}
+
+path {
+    fill: none;
+}
+
+text {
+    font-family: Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
+.axis {
+    stroke: black;
+    opacity: 0.6;
+}
+
+.axis-text {
+    stroke: black;
+    fill: black;
+    font-size: 16px;
+    opacity: 1;
+}
+
+.tick-label {
+    fill: black;
+    stroke: black;
+    font-size: 16px;
+}
+
+.guiding-line {
+    stroke: black;
+    opacity: 0.2;
+}
+
+.food-polygon {
+    fill-opacity: 0.2;
+    stroke-opacity: 0.9;
+    stroke-width: 1.5;
+ 		
+	</style>
+	<g transform="translate(30,30)"><g class="coord-system" transform="translate(450,220)"><g><path class="guiding-line" d="M0,-30L25.980762113533157,-15.000000000000004L25.980762113533164,14.999999999999993L3.67394039744206e-15,30L-25.980762113533153,15.000000000000014L-25.98076211353317,-14.999999999999979L0,-30"></path></g><g><path class="guiding-line" d="M0,-68L58.88972745734183,-34.00000000000001L58.88972745734184,33.999999999999986L8.327598234202001e-15,68L-58.889727457341806,34.00000000000003L-58.889727457341856,-33.99999999999995L0,-68"></path></g><g><path class="guiding-line" d="M0,-106L91.7986928011505,-53.000000000000014L91.79869280115051,52.99999999999998L1.2981256070961945e-14,106L-91.79869280115047,53.00000000000005L-91.79869280115054,-52.99999999999992L0,-106"></path></g><g><path class="guiding-line" d="M0,-144L124.70765814495915,-72.00000000000001L124.7076581449592,71.99999999999997L1.7634913907721887e-14,144L-124.70765814495913,72.00000000000006L-124.70765814495923,-71.9999999999999L0,-144"></path></g><g><path class="guiding-line" d="M0,-182L157.61662348876783,-91.00000000000001L157.61662348876786,90.99999999999996L2.228857174448183e-14,182L-157.61662348876777,91.00000000000009L-157.6166234887679,-90.99999999999987L0,-182"></path></g><g><path class="guiding-line" d="M0,-220L190.5255888325765,-110.00000000000003L190.52558883257655,109.99999999999996L2.694222958124177e-14,220L-190.52558883257643,110.0000000000001L-190.5255888325766,-109.99999999999984L0,-220"></path></g><g class="axis" transform="rotate(180)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M0,30.5H0.5V220.5H0"></path><g class="tick" opacity="1" transform="translate(0,30)"><line stroke="#000" x2="0" y1="0.5" y2="0.5"></line><text fill="#000" x="-3" y="0.5" dy="0.32em" transform="rotate(180)" class="tick-label">0</text></g><g class="tick" opacity="1" transform="translate(0,68)"><line stroke="#000" x2="0" y1="0.5" y2="0.5"></line><text fill="#000" x="-3" y="0.5" dy="0.32em" transform="rotate(180)" class="tick-label">20</text></g><g class="tick" opacity="1" transform="translate(0,106)"><line stroke="#000" x2="0" y1="0.5" y2="0.5"></line><text fill="#000" x="-3" y="0.5" dy="0.32em" transform="rotate(180)" class="tick-label">40</text></g><g class="tick" opacity="1" transform="translate(0,144)"><line stroke="#000" x2="0" y1="0.5" y2="0.5"></line><text fill="#000" x="-3" y="0.5" dy="0.32em" transform="rotate(180)" class="tick-label">60</text></g><g class="tick" opacity="1" transform="translate(0,182)"><line stroke="#000" x2="0" y1="0.5" y2="0.5"></line><text fill="#000" x="-3" y="0.5" dy="0.32em" transform="rotate(180)" class="tick-label">80</text></g><g class="tick" opacity="1" transform="translate(0,220)"><line stroke="#000" x2="0" y1="0.5" y2="0.5"></line><text fill="#000" x="-3" y="0.5" dy="0.32em" transform="rotate(180)" class="tick-label">100</text></g><text class="axis-text" y="235" transform="rotate(-180,0,235)" text-anchor="middle">starch</text></g><g class="axis" transform="rotate(240)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M0,30.5H0.5V220.5H0"></path><text class="axis-text" y="235" transform="rotate(-240,0,235)" text-anchor="start">sugars</text></g><g class="axis" transform="rotate(300)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M0,30.5H0.5V220.5H0"></path><text class="axis-text" y="235" transform="rotate(-300,0,235)" text-anchor="start">fibres</text></g><g class="axis" transform="rotate(0)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M0,30.5H0.5V220.5H0"></path><text class="axis-text" y="235" transform="rotate(0,0,235)" text-anchor="middle">fat</text></g><g class="axis" transform="rotate(59.99999999999997)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M0,30.5H0.5V220.5H0"></path><text class="axis-text" y="235" transform="rotate(-59.99999999999997,0,235)" text-anchor="end">protein</text></g><g class="axis" transform="rotate(119.99999999999994)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M0,30.5H0.5V220.5H0"></path><text class="axis-text" y="235" transform="rotate(-119.99999999999994,0,235)" text-anchor="end">water</text></g></g></g></svg>
