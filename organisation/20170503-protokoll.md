@@ -18,20 +18,20 @@ Claude
 
 Jonas
 
-- Poster fertig machen
-- Namen der Lebensmittel von Hand auf max 16 Zeichen kürzen
-- Text schreiben
+- [*] Poster fertig machen
+- [*] Namen der Lebensmittel von Hand auf max 16 Zeichen kürzen
+- [*] Text schreiben
     - Part 2
-        - Reflexion
-- Quellen zitieren
-- Stories
+        [*] Reflexion
+- [*] Quellen zitieren
+- [*] Stories
     - Viel Kalorien = viel Fett (grosser Chart)
     - Extremisten: Karamell (Zucker), Kokosflocken (Fett, Nahrungsfaser), Popcorn (Stärke), Rhabarber (Wasser), Rindsschulter (Protein)
     - good (e.g. Bohnen, Linsen getrocktnet), bad (e.g Pommes Chips, Kakaopulver), ugly (Bierhefe, Vollmilchpulver) in bezug auf Ansehen in der Bevölkerung und wirkliche Nützlichkeit der Nahrungsmittel.
     - Vergleich zwischen Nahrungsmitteln aus unterschiedlichen Kategorien, aber mit ähnlichem Inhalt. I.e. mögliche Ersatznahrungsmittel.
     - Ausgeglichene Nahrungsmittel
 
-- Farben
+[*] Farben
     ["#6c8137",
     "#9d53d6",
     "#73d350",
