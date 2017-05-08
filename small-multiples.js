@@ -1,5 +1,5 @@
 function preprocess(d) {
-    d = augmentWithCategories(d);
+
     return {
         name: d['name changed'],
         starch: parseValue(d.starch),
@@ -18,18 +18,6 @@ function preprocess(d) {
         } else {
             return parseInt(value);
         }
-    }
-
-    function augmentWithCategories(food) {
-        var categoryString = food['category D'];
-        var categoryHierarchies = categoryString.split(';');
-        categoryHierarchies.forEach(function (hierarchyString, idx1, hierarchies) {
-            var propertyName = 'category' + (idx1 + 1);
-            hierarchyString.split('/').forEach(function (category, idx2, categories) {
-                food[propertyName + (idx2 + 1)] = category;
-            });
-        });
-        return food;
     }
 }
 
@@ -70,7 +58,7 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
     let axesNames = d3.keys(foods[0]).filter(key =>
         key !== 'name' && key !== 'energy' && key !== 'gridCoords' && key !== 'categories' && key !== 'category');
     let mainCategories = getMainCategories(foods);
-    console.log(mainCategories);
+    
     let colorScale = d3.scaleOrdinal()
         .domain(mainCategories)
         .range(categoryColors);

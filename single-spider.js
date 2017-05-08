@@ -8,7 +8,7 @@ function preprocess(d) {
     }
 
     return {
-        name: d['name D'],
+        name: d['name changed'],
         starch: parseValue(d.starch),
         sugars: parseValue(d.sugars),
         fibres: parseValue(d['dietary fibres']),
@@ -40,11 +40,44 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
 
     let mainCategories = getMainCategories(foods);
 
-    let includedFoods = [
-        'Bohne, grün, getrocknet',
-        'Pistazie',
-        'Vollmilchpulver'
+
+    let extremisten = [
+        'Hard caramels',
+        'Coconut',
+        'Popcorn',
+        'Rhubarb, raw',
+        'Beef shoulder'
+    ]
+
+    let flours = [
+        'Semi w. flour 720',
+        'High ash flour 1100',
+        'Wholemeal flour 1700',
+        'Bakery flour 550',
+        'White flour 400',
     ];
+
+    let ausgeglichene = [
+        'Cashew nut',
+        'Whole milk powd.',
+        'Pistachio, dried',
+        'Cheese quiche',
+        'Fish sticks',
+    ];
+
+
+    let goodbadugly = [
+        'Dried beans',
+        'Dried lentil',
+        'Pommes Chips',
+        'Cocoa powder',
+        'Dried yeast',
+        'Whole milk powd.',
+    ];
+
+    let includedFoods = goodbadugly;
+
+
     foods = foods.filter(food => includedFoods.indexOf(food.name) !== -1);
 
     
@@ -52,6 +85,8 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
     let colorScale = d3.scaleOrdinal()
         .domain(mainCategories)
         .range(categoryColors);
+
+
 
     // 'Global' variables used in most methods.
     let axesNames = d3.keys(foods[0]).filter( function(key)  { return (key !== 'name' && key !== 'category') });
@@ -124,11 +159,12 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
                 .call(axis);
 
             axisSelection.selectAll("text")
+                .attr('class', "tick-text")
                 .attr("transform", "rotate(180), translate(-3, -3)")
 
 
             axisSelection.selectAll(".domain")
-                .attr('stroke', '');
+                .attr('stroke', '#C7B3A4');
 
             axisSelection.append('text')
                 .attr('class', 'axis-text')
