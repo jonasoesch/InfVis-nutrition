@@ -122,7 +122,7 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
     drawCenterPolygon(spiderChart);
     let pointsGroup = spiderChart.append('g')
         .attr('id', 'polygon-points');
-    drawPolygonPoints(pointsGroup);
+    // drawPolygonPoints(pointsGroup);
 
 
 
@@ -222,7 +222,7 @@ d3.tsv('data/food-data.txt', preprocess, function (err, foods) {
                 .forEach(function (point) {
                     pointsGroup.append('circle')
                         .attr('class', 'food-points')
-                        .attr('fill', d3.schemeCategory10[idx])
+                        .attr('fill', colorScale(food.category))
                         .attr('cx', point[0])
                         .attr('cy', point[1]);
                 });
