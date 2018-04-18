@@ -3,6 +3,11 @@
 This project visualizes nutrients from different foods. The data source is the
 [Swiss Food Composition Database](http://www.naehrwertdaten.ch/request?xml=MessageData&xml=MetaData&xsl=Start&lan=de&pageKey=Start).
 
+## Result
+
+![](foodopera-preview.png)
+
+## Database schema
 The database contains information on a vast range of nutrients which are listed here:
 
 * name D
